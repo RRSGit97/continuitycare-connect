@@ -16,13 +16,19 @@ interface Milestone {
   tasks: string[];
   notes?: string;
   goals?: string[];
+  red_flags?: string[];
+}
+
+interface MilestonesData {
+  vitals_required?: string[];
+  days: Milestone[];
 }
 
 interface CarePlan {
   id: string;
   title: string;
   status: string;
-  milestones: Milestone[];
+  milestones: MilestonesData | Milestone[] | null;
   approved_at: string | null;
 }
 
@@ -32,8 +38,15 @@ interface PlanTimelineEditorProps {
 }
 
 export const PlanTimelineEditor = ({ carePlan, onUpdate }: PlanTimelineEditorProps) => {
+  // Extract days array from milestones structure
+  const getDaysArray = (milestones: MilestonesData | Milestone[] | null): Milestone[] => {
+    if (!milestones) return [];
+    if (Array.isArray(milestones)) return milestones;
+    return (milestones as MilestonesData).days || [];
+  };
+
   const [editing, setEditing] = useState(false);
-  const [editedMilestones, setEditedMilestones] = useState<Milestone[]>(carePlan.milestones || []);
+  const [editedMilestones, setEditedMilestones] = useState<Milestone[]>(getDaysArray(carePlan.milestones));
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -44,8 +57,11 @@ export const PlanTimelineEditor = ({ carePlan, onUpdate }: PlanTimelineEditorPro
       const { error } = await supabase
         .from("care_plans")
         .update({
-          milestones: editedMilestones as any,
-          status: "pending_approval", // Requires approval after edits
+          milestones: {
+            days: editedMilestones,
+            vitals_required: (carePlan.milestones as MilestonesData)?.vitals_required || []
+          } as any,
+          status: "pending_approval",
         })
         .eq("id", carePlan.id);
 
@@ -129,14 +145,14 @@ export const PlanTimelineEditor = ({ carePlan, onUpdate }: PlanTimelineEditorPro
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>{carePlan.title}</CardTitle>
-              <CardDescription className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2">
                 {getStatusBadge(carePlan.status)}
                 {carePlan.approved_at && (
                   <span className="text-xs text-muted-foreground">
                     Approved: {new Date(carePlan.approved_at).toLocaleDateString()}
                   </span>
                 )}
-              </CardDescription>
+              </div>
             </div>
             <div className="flex gap-2">
               {!editing && carePlan.status !== "active" && (
@@ -170,7 +186,7 @@ export const PlanTimelineEditor = ({ carePlan, onUpdate }: PlanTimelineEditorPro
         </CardHeader>
         <CardContent>
           <Accordion type="single" collapsible className="w-full">
-            {(editing ? editedMilestones : carePlan.milestones || []).map((milestone, index) => (
+            {(editing ? editedMilestones : getDaysArray(carePlan.milestones)).map((milestone, index) => (
               <AccordionItem key={index} value={`day-${milestone.day}`}>
                 <AccordionTrigger>
                   <div className="flex items-center gap-3">
