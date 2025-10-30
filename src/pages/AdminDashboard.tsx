@@ -1,0 +1,71 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Settings, Users, BarChart3, Shield } from "lucide-react";
+
+const AdminDashboard = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-card">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-foreground">Admin Portal</h1>
+          <Button variant="outline" size="sm">Profile</Button>
+        </div>
+      </header>
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-foreground mb-2">System Administration</h2>
+          <p className="text-muted-foreground">Manage platform users and settings</p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <Users className="h-8 w-8 text-primary mb-2" />
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>Manage all platform users and roles</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full">Manage Users</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <BarChart3 className="h-8 w-8 text-secondary mb-2" />
+              <CardTitle>Analytics</CardTitle>
+              <CardDescription>View platform usage and metrics</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">View Reports</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <Shield className="h-8 w-8 text-accent mb-2" />
+              <CardTitle>Security & Compliance</CardTitle>
+              <CardDescription>Audit logs and security settings</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">View Logs</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <Settings className="h-8 w-8 text-primary mb-2" />
+              <CardTitle>System Settings</CardTitle>
+              <CardDescription>Configure platform parameters</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">Configure</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default AdminDashboard;
