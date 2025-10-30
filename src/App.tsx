@@ -11,6 +11,7 @@ import ProviderDashboard from "./pages/ProviderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SeedData from "./pages/SeedData";
 
 import AdminConsent from "./pages/AdminConsent";
 
@@ -25,7 +26,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route 
+          <Route path="/seed" element={<SeedData />} />
+          <Route
             path="/dashboard/patient" 
             element={
               <ProtectedRoute allowedRoles={["patient"]}>
