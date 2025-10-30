@@ -94,6 +94,34 @@ const SeedData = () => {
     }
   };
 
+  const runAnalyticsSeed = async () => {
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('seed-analytics-data', {
+        method: 'POST',
+      });
+
+      if (error) throw error;
+
+      setResult(data);
+      toast({
+        title: "Success",
+        description: "Analytics demo data generated successfully",
+      });
+    } catch (error) {
+      console.error('Seed error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate analytics data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <Card>
@@ -158,6 +186,28 @@ const SeedData = () => {
                 <li>Go to Monthly Compliance Report</li>
                 <li>Select current month and generate report</li>
                 <li>Export compliance report to CSV</li>
+              </ol>
+            </div>
+          </div>
+
+          <div className="border-t pt-4 mt-4">
+            <h3 className="font-semibold text-lg mb-2">Analytics Dashboard Testing</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Generate demo data to test analytics charts and metrics
+            </p>
+            <Button onClick={runAnalyticsSeed} disabled={loading} className="w-full" variant="secondary">
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? "Generating..." : "Generate Analytics Data"}
+            </Button>
+            <div className="mt-3 p-3 bg-muted rounded-lg text-sm">
+              <p className="font-medium mb-1">Analytics Test Steps:</p>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                <li>Click "Generate Analytics Data" above</li>
+                <li>Sign in as admin@test.com (password: password123)</li>
+                <li>Go to Admin Dashboard → Analytics</li>
+                <li>View KPI cards showing key metrics</li>
+                <li>Check the 7-day trend line chart</li>
+                <li>Verify adherence %, completion rate, and CSAT scores</li>
               </ol>
             </div>
           </div>
