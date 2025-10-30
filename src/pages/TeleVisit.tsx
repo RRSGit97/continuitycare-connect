@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -43,6 +46,11 @@ const TeleVisit = () => {
   const [micEnabled, setMicEnabled] = useState(true);
   const [camEnabled, setCamEnabled] = useState(true);
   const [visitStartTime, setVisitStartTime] = useState<Date | null>(null);
+
+  // Post-visit summary state
+  const [showSummaryDialog, setShowSummaryDialog] = useState(false);
+  const [clinicalSummary, setClinicalSummary] = useState("");
+  const [nextSteps, setNextSteps] = useState("");
 
   useEffect(() => {
     if (userId && episodeId) {
@@ -217,17 +225,88 @@ const TeleVisit = () => {
         stream.getTracks().forEach(track => track.stop());
       }
 
-      toast({
-        title: "Visit Ended",
-        description: `Session completed (${duration} minutes)`,
-      });
-
-      navigate(`/dashboard/${role === "specialist" ? "specialist" : "patient"}`);
+      // Show summary form for specialists only
+      if (role === "specialist") {
+        setInVisit(false);
+        setShowSummaryDialog(true);
+      } else {
+        toast({
+          title: "Visit Ended",
+          description: `Session completed (${duration} minutes)`,
+        });
+        navigate("/dashboard/patient");
+      }
     } catch (error) {
       console.error("Error ending visit:", error);
       toast({
         title: "Error",
         description: "Failed to end tele-visit",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitSummary = async () => {
+    if (!visitId || !episode) return;
+
+    try {
+      setLoading(true);
+
+      // Create summary text content
+      const summaryContent = `CLINICAL SUMMARY\n\nDate: ${new Date().toLocaleString()}\nEpisode: ${episode.surgery_type}\nVisit ID: ${visitId}\n\n--- Clinical Summary ---\n${clinicalSummary}\n\n--- Next Steps ---\n${nextSteps}`;
+      
+      const fileName = `clinical-summary-${visitId}.txt`;
+      const storagePath = `summaries/${fileName}`;
+
+      // Insert attachment record
+      const { data: attachment, error: attachmentError } = await supabase
+        .from("attachments")
+        .insert({
+          episode_id: episode.id,
+          file_name: fileName,
+          file_type: "text/plain",
+          file_size: summaryContent.length,
+          storage_path: storagePath,
+          attachment_type: "clinical_summary",
+          description: "Clinical summary and next steps from tele-visit",
+          uploaded_by: userId,
+        })
+        .select()
+        .single();
+
+      if (attachmentError) throw attachmentError;
+
+      // Log to audit_logs
+      const { error: auditError } = await supabase
+        .from("audit_logs")
+        .insert({
+          actor_id: userId,
+          action: "CREATE_CLINICAL_SUMMARY",
+          entity: "tele_visits",
+          entity_id: visitId,
+          new_data: {
+            attachment_id: attachment.id,
+            clinical_summary: clinicalSummary,
+            next_steps: nextSteps,
+            episode_id: episode.id,
+          },
+        });
+
+      if (auditError) console.error("Audit log error:", auditError);
+
+      toast({
+        title: "Summary Saved",
+        description: "Clinical summary has been recorded",
+      });
+
+      navigate("/dashboard/specialist");
+    } catch (error) {
+      console.error("Error saving summary:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save clinical summary",
         variant: "destructive",
       });
     } finally {
@@ -470,6 +549,63 @@ const TeleVisit = () => {
           </div>
         )}
       </main>
+
+      {/* Post-Visit Summary Dialog */}
+      <Dialog open={showSummaryDialog} onOpenChange={setShowSummaryDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Clinical Summary</DialogTitle>
+            <DialogDescription>
+              Document the clinical summary and next steps for this tele-visit
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="clinical-summary">Clinical Summary</Label>
+              <Textarea
+                id="clinical-summary"
+                placeholder="Document key findings, patient status, and clinical observations..."
+                value={clinicalSummary}
+                onChange={(e) => setClinicalSummary(e.target.value)}
+                rows={6}
+                className="resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="next-steps">Next Steps</Label>
+              <Textarea
+                id="next-steps"
+                placeholder="Outline follow-up actions, medications, appointments, or care plan adjustments..."
+                value={nextSteps}
+                onChange={(e) => setNextSteps(e.target.value)}
+                rows={6}
+                className="resize-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSummaryDialog(false);
+                navigate("/dashboard/specialist");
+              }}
+            >
+              Skip
+            </Button>
+            <Button
+              onClick={submitSummary}
+              disabled={!clinicalSummary.trim() || !nextSteps.trim() || loading}
+            >
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save Summary
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
