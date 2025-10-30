@@ -97,49 +97,99 @@ Deno.serve(async (req) => {
         .single()
 
       if (patient && provider) {
-        // Create episode
-        const { data: episode, error: episodeError } = await supabaseAdmin
+        // Check if episode already exists
+        const { data: existingEpisode } = await supabaseAdmin
           .from('episodes_of_care')
-          .insert({
-            patient_id: patient.id,
-            specialist_id: provider.id,
-            surgery_type: 'Knee Replacement',
-            surgery_date: '2025-01-15',
-            surgery_location: 'Memorial Hospital',
-            expected_recovery_weeks: 12,
-            status: 'active'
-          })
-          .select()
-          .single()
+          .select('id')
+          .eq('patient_id', patient.id)
+          .eq('specialist_id', provider.id)
+          .eq('status', 'active')
+          .maybeSingle()
 
-        if (episodeError) {
-          results.errors.push(`Failed to create episode: ${episodeError.message}`)
-        } else {
-          results.episode = episode
+        let episodeId = existingEpisode?.id
 
-          // Create care plan
-          const { data: carePlan, error: carePlanError } = await supabaseAdmin
-            .from('care_plans')
+        if (!episodeId) {
+          // Create episode
+          const { data: episode, error: episodeError } = await supabaseAdmin
+            .from('episodes_of_care')
             .insert({
-              episode_id: episode.id,
-              created_by: provider.id,
-              title: 'Post-Surgery Recovery Plan',
-              description: 'Comprehensive care plan for knee replacement recovery',
-              instructions: 'Follow all exercises daily and take medications as prescribed',
-              medications: [
-                { name: 'Pain Relief', dosage: '500mg', frequency: 'twice daily' }
-              ],
-              exercises: [
-                { name: 'Leg raises', sets: 3, reps: 10, frequency: 'daily' }
-              ]
+              patient_id: patient.id,
+              specialist_id: provider.id,
+              surgery_type: 'Knee Replacement',
+              surgery_date: '2025-01-15',
+              surgery_location: 'Memorial Hospital',
+              expected_recovery_weeks: 12,
+              status: 'active'
             })
             .select()
             .single()
 
-          if (carePlanError) {
-            results.errors.push(`Failed to create care plan: ${carePlanError.message}`)
+          if (episodeError) {
+            results.errors.push(`Failed to create episode: ${episodeError.message}`)
           } else {
-            results.carePlan = carePlan
+            results.episode = episode
+            episodeId = episode.id
+          }
+        } else {
+          results.episode = { id: episodeId, status: 'already exists' }
+        }
+
+        // Create care plan if episode exists
+        if (episodeId) {
+          const { data: existingPlan } = await supabaseAdmin
+            .from('care_plans')
+            .select('id')
+            .eq('episode_id', episodeId)
+            .maybeSingle()
+
+          if (existingPlan) {
+            results.carePlan = { id: existingPlan.id, status: 'already exists' }
+          } else {
+            const { data: carePlan, error: carePlanError } = await supabaseAdmin
+              .from('care_plans')
+              .insert({
+                episode_id: episodeId,
+                created_by: specialistUser.id,  // Use user_id, not provider id
+                title: 'Post-Knee Replacement Recovery Plan',
+                description: 'Comprehensive care plan for knee replacement recovery',
+                instructions: 'Follow all exercises daily and take medications as prescribed',
+                medications: [
+                  { name: 'Ibuprofen', dosage: '400mg', frequency: 'Every 6 hours as needed' },
+                  { name: 'Blood Thinner', dosage: '10mg', frequency: 'Once daily' }
+                ],
+                exercises: [
+                  { name: 'Ankle pumps', sets: 3, reps: 15, frequency: 'Every 2 hours while awake' },
+                  { name: 'Quad sets', sets: 3, reps: 10, frequency: 'Daily' },
+                  { name: 'Straight leg raises', sets: 2, reps: 10, frequency: 'Twice daily' }
+                ]
+              })
+              .select()
+              .single()
+
+            if (carePlanError) {
+              results.errors.push(`Failed to create care plan: ${carePlanError.message}`)
+            } else {
+              results.carePlan = carePlan
+
+              // Create initial adherence log with test vitals
+              const today = new Date().toISOString().split('T')[0]
+              const { error: logError } = await supabaseAdmin
+                .from('adherence_logs')
+                .insert({
+                  patient_id: patient.id,
+                  care_plan_id: carePlan.id,
+                  log_date: today,
+                  bp_systolic: 120,
+                  bp_diastolic: 80,
+                  heart_rate: 72,
+                  spo2: 98,
+                  notes: 'Initial vitals entry from seed script'
+                })
+
+              if (logError && !logError.message.includes('duplicate')) {
+                results.errors.push(`Failed to create adherence log: ${logError.message}`)
+              }
+            }
           }
         }
       }
