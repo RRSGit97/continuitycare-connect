@@ -12,6 +12,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import AdminConsent from "./pages/AdminConsent";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -52,6 +54,14 @@ const App = () => (
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/consent" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminConsent />
               </ProtectedRoute>
             } 
           />

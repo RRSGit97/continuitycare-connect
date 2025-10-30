@@ -101,10 +101,16 @@ const RoleBasedNav = () => {
                 Profile
               </DropdownMenuItem>
               {role === 'admin' && (
-                <DropdownMenuItem onClick={() => navigate('/dashboard/admin')}>
-                  <Shield className="mr-2 h-4 w-4" />
-                  Admin Panel
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/admin')}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin Panel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/admin/consent')}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Consent Management
+                  </DropdownMenuItem>
+                </>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
