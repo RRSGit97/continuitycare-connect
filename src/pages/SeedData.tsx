@@ -66,6 +66,34 @@ const SeedData = () => {
     }
   };
 
+  const runAuditSeed = async () => {
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('seed-audit-data', {
+        method: 'POST',
+      });
+
+      if (error) throw error;
+
+      setResult(data);
+      toast({
+        title: "Success",
+        description: "Audit test data generated successfully",
+      });
+    } catch (error) {
+      console.error('Seed error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate audit data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <Card>
@@ -108,6 +136,30 @@ const SeedData = () => {
               <li>Toggle consent off in Admin Console → Consent Management</li>
               <li>Refresh provider portal - Patient A should disappear</li>
             </ol>
+          </div>
+
+          <div className="border-t pt-4 mt-4">
+            <h3 className="font-semibold text-lg mb-2">Admin Audit Testing</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Generate audit log entries to test the admin dashboard features
+            </p>
+            <Button onClick={runAuditSeed} disabled={loading} className="w-full" variant="secondary">
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? "Generating..." : "Generate Audit Data"}
+            </Button>
+            <div className="mt-3 p-3 bg-muted rounded-lg text-sm">
+              <p className="font-medium mb-1">Audit Test Steps:</p>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                <li>Click "Generate Audit Data" above</li>
+                <li>Sign in as admin@test.com (password: password123)</li>
+                <li>Go to Admin Dashboard → Audit Log Explorer</li>
+                <li>Filter by entity, actor, and date ranges</li>
+                <li>Export audit logs to CSV</li>
+                <li>Go to Monthly Compliance Report</li>
+                <li>Select current month and generate report</li>
+                <li>Export compliance report to CSV</li>
+              </ol>
+            </div>
           </div>
 
           {result && (
