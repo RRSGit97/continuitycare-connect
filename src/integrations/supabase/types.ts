@@ -656,6 +656,7 @@ export type Database = {
       tele_visits: {
         Row: {
           created_at: string
+          csat_rating: number | null
           duration_minutes: number
           episode_id: string
           id: string
@@ -668,6 +669,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          csat_rating?: number | null
           duration_minutes?: number
           episode_id: string
           id?: string
@@ -680,6 +682,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          csat_rating?: number | null
           duration_minutes?: number
           episode_id?: string
           id?: string

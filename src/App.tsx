@@ -13,6 +13,7 @@ import AdminConsent from "./pages/AdminConsent";
 import AdminUsers from "./pages/AdminUsers";
 import AdminAuditLogs from "./pages/AdminAuditLogs";
 import AdminReports from "./pages/AdminReports";
+import AdminAnalytics from "./pages/AdminAnalytics";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SeedData from "./pages/SeedData";
@@ -99,6 +100,14 @@ const App = () => (
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminReports />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/analytics" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminAnalytics />
               </ProtectedRoute>
             } 
           />

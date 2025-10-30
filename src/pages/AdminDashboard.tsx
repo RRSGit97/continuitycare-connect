@@ -38,8 +38,8 @@ const AdminDashboard = () => {
               <CardDescription>View platform usage and metrics</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full" onClick={() => navigate("/admin/reports")}>
-                View Reports
+              <Button variant="outline" className="w-full" onClick={() => navigate("/admin/analytics")}>
+                View Analytics
               </Button>
             </CardContent>
           </Card>
