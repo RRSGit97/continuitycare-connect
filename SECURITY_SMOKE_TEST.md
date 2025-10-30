@@ -33,14 +33,12 @@ Verify that RLS policies correctly enforce:
    - Role: **Patient**
    - Full Name: `Test Patient B`
 
-### Step 3: Create Episode for Patient A
-1. Open Backend (Lovable Cloud dashboard)
-2. Navigate to `episodes_of_care` table
-3. Insert a record:
-   ```sql
-   -- First, get patient A's patient_id from the patients table
-   -- Then create an episode (you'll need a specialist_id - create one first)
-   ```
+### Step 3: Test Data Created ✅
+Test data has been created:
+- **Episode ID**: `386f7730-6c70-44bb-969b-1e40db100e1a`
+- **Patient A ID**: `8f950be8-8b35-4f06-af0d-169b4bb8caad`
+- **Specialist ID**: `cb4a3564-1e8a-4e1d-9d82-78fba4bf8f7d`
+- **Care Plan ID**: `fa33a2b0-a706-48e9-a7ec-5fc3b6e84695`
 
 ### Step 4: Verify Isolation
 1. Log in as **Patient B**
