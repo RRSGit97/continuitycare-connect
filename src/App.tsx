@@ -9,12 +9,14 @@ import PatientDashboard from "./pages/PatientDashboard";
 import SpecialistDashboard from "./pages/SpecialistDashboard";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminConsent from "./pages/AdminConsent";
+import AdminUsers from "./pages/AdminUsers";
+import AdminAuditLogs from "./pages/AdminAuditLogs";
+import AdminReports from "./pages/AdminReports";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SeedData from "./pages/SeedData";
 import TeleVisit from "./pages/TeleVisit";
-
-import AdminConsent from "./pages/AdminConsent";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +63,22 @@ const App = () => (
             } 
           />
           <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/users" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminUsers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
             path="/admin/consent" 
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
@@ -69,7 +87,23 @@ const App = () => (
             } 
           />
           <Route 
-            path="/tele-visit" 
+            path="/admin/audit" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminAuditLogs />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/reports" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminReports />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tele-visit"
             element={
               <ProtectedRoute allowedRoles={["patient", "specialist"]}>
                 <TeleVisit />

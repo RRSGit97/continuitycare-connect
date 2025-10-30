@@ -2,8 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Settings, Users, BarChart3, Shield } from "lucide-react";
 import RoleBasedNav from "@/components/RoleBasedNav";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-background">
       <RoleBasedNav />
@@ -22,7 +25,9 @@ const AdminDashboard = () => {
               <CardDescription>Manage all platform users and roles</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">Manage Users</Button>
+              <Button className="w-full" onClick={() => navigate("/admin/users")}>
+                Manage Users
+              </Button>
             </CardContent>
           </Card>
 
@@ -33,7 +38,9 @@ const AdminDashboard = () => {
               <CardDescription>View platform usage and metrics</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">View Reports</Button>
+              <Button variant="outline" className="w-full" onClick={() => navigate("/admin/reports")}>
+                View Reports
+              </Button>
             </CardContent>
           </Card>
 
@@ -44,7 +51,9 @@ const AdminDashboard = () => {
               <CardDescription>Audit logs and security settings</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">View Logs</Button>
+              <Button variant="outline" className="w-full" onClick={() => navigate("/admin/audit")}>
+                View Logs
+              </Button>
             </CardContent>
           </Card>
 
