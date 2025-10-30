@@ -233,8 +233,64 @@ export type Database = {
           },
         ]
       }
+      care_plan_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          dietary_restrictions: string[] | null
+          duration_days: number
+          exercises: Json | null
+          follow_up_schedule: Json | null
+          id: string
+          instructions: string | null
+          is_active: boolean
+          medications: Json | null
+          milestones: Json | null
+          name: string
+          template_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          dietary_restrictions?: string[] | null
+          duration_days?: number
+          exercises?: Json | null
+          follow_up_schedule?: Json | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          medications?: Json | null
+          milestones?: Json | null
+          name: string
+          template_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          dietary_restrictions?: string[] | null
+          duration_days?: number
+          exercises?: Json | null
+          follow_up_schedule?: Json | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          medications?: Json | null
+          milestones?: Json | null
+          name?: string
+          template_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       care_plans: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           created_by: string
           description: string | null
@@ -245,10 +301,15 @@ export type Database = {
           id: string
           instructions: string | null
           medications: Json | null
+          milestones: Json | null
+          status: string
+          template_id: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by: string
           description?: string | null
@@ -259,10 +320,15 @@ export type Database = {
           id?: string
           instructions?: string | null
           medications?: Json | null
+          milestones?: Json | null
+          status?: string
+          template_id?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by?: string
           description?: string | null
@@ -273,6 +339,9 @@ export type Database = {
           id?: string
           instructions?: string | null
           medications?: Json | null
+          milestones?: Json | null
+          status?: string
+          template_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -282,6 +351,13 @@ export type Database = {
             columns: ["episode_id"]
             isOneToOne: false
             referencedRelation: "episodes_of_care"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_plans_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "care_plan_templates"
             referencedColumns: ["id"]
           },
         ]
