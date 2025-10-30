@@ -10,6 +10,7 @@ import SpecialistDashboard from "./pages/SpecialistDashboard";
 import ProviderDashboard from "./pages/ProviderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -22,10 +23,38 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard/patient" element={<PatientDashboard />} />
-          <Route path="/dashboard/specialist" element={<SpecialistDashboard />} />
-          <Route path="/dashboard/provider" element={<ProviderDashboard />} />
-          <Route path="/dashboard/admin" element={<AdminDashboard />} />
+          <Route 
+            path="/dashboard/patient" 
+            element={
+              <ProtectedRoute allowedRoles={["patient"]}>
+                <PatientDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard/specialist" 
+            element={
+              <ProtectedRoute allowedRoles={["specialist"]}>
+                <SpecialistDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard/provider" 
+            element={
+              <ProtectedRoute allowedRoles={["local_provider"]}>
+                <ProviderDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/dashboard/admin" 
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
