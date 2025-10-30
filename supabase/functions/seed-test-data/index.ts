@@ -54,7 +54,16 @@ Deno.serve(async (req) => {
 
         if (userExists) {
           userId = userExists.id
-          results.users.push({ email: testUser.email, id: userId, status: 'already exists' })
+          
+          // Ensure user is confirmed
+          if (!userExists.email_confirmed_at) {
+            await supabaseAdmin.auth.admin.updateUserById(userId, {
+              email_confirm: true
+            })
+            results.users.push({ email: testUser.email, id: userId, status: 'confirmed' })
+          } else {
+            results.users.push({ email: testUser.email, id: userId, status: 'already exists' })
+          }
         } else {
           // Create user
           const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
