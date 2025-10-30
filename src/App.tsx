@@ -12,6 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SeedData from "./pages/SeedData";
+import TeleVisit from "./pages/TeleVisit";
 
 import AdminConsent from "./pages/AdminConsent";
 
@@ -64,6 +65,14 @@ const App = () => (
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminConsent />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tele-visit" 
+            element={
+              <ProtectedRoute allowedRoles={["patient", "specialist"]}>
+                <TeleVisit />
               </ProtectedRoute>
             } 
           />

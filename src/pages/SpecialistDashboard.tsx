@@ -8,6 +8,7 @@ import RoleBasedNav from "@/components/RoleBasedNav";
 import { TemplatesList } from "@/components/specialist/TemplatesList";
 import { AssignPlanDialog } from "@/components/specialist/AssignPlanDialog";
 import { PlanTimelineEditor } from "@/components/specialist/PlanTimelineEditor";
+import { EpisodesWithVisitLinks } from "@/components/specialist/EpisodesWithVisitLinks";
 import { Loader2, ClipboardList, Users, FileText } from "lucide-react";
 
 const SpecialistDashboard = () => {
@@ -170,26 +171,7 @@ const SpecialistDashboard = () => {
           </TabsContent>
 
           <TabsContent value="episodes" className="mt-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {episodes.map((episode) => (
-                <Card key={episode.id}>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold">
-                      {episode.patients.profiles?.full_name || episode.patients.profiles?.email}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">{episode.surgery_type}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Surgery Date: {new Date(episode.surgery_date).toLocaleDateString()}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-              {episodes.length === 0 && (
-                <p className="text-muted-foreground col-span-full text-center py-8">
-                  No active episodes found
-                </p>
-              )}
-            </div>
+            <EpisodesWithVisitLinks episodes={episodes} />
           </TabsContent>
 
           <TabsContent value="plans" className="mt-6">

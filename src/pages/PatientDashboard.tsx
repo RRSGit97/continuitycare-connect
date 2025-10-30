@@ -10,7 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import RoleBasedNav from "@/components/RoleBasedNav";
-import { ClipboardList, Activity, AlertCircle, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ClipboardList, Activity, AlertCircle, Loader2, Video } from "lucide-react";
 import { z } from "zod";
 
 const vitalsSchema = z.object({
@@ -32,12 +33,20 @@ interface CarePlan {
   exercises?: Array<{ name: string; sets?: number; reps?: number; frequency: string }>;
 }
 
+interface Episode {
+  id: string;
+  surgery_type: string;
+  care_plans?: any[];
+}
+
 const PatientDashboard = () => {
   const { userId } = useUserRole();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [patientId, setPatientId] = useState<string | null>(null);
+  const [episode, setEpisode] = useState<Episode | null>(null);
   const [carePlan, setCarePlan] = useState<CarePlan | null>(null);
   const [todayLog, setTodayLog] = useState<any>(null);
   
@@ -78,6 +87,7 @@ const PatientDashboard = () => {
         .from("episodes_of_care")
         .select(`
           id,
+          surgery_type,
           care_plans (
             id,
             title,
@@ -90,22 +100,26 @@ const PatientDashboard = () => {
         .order("created_at", { ascending: false })
         .limit(1);
 
-      if (episodes && episodes.length > 0 && episodes[0].care_plans) {
-        const plans = episodes[0].care_plans as any[];
-        if (plans.length > 0) {
-          setCarePlan(plans[0]);
+      if (episodes && episodes.length > 0) {
+        setEpisode(episodes[0]);
+        
+        if (episodes[0].care_plans) {
+          const plans = episodes[0].care_plans as any[];
+          if (plans.length > 0) {
+            setCarePlan(plans[0]);
 
-          // Get today's log
-          const today = new Date().toISOString().split("T")[0];
-          const { data: log } = await supabase
-            .from("adherence_logs")
-            .select("*")
-            .eq("patient_id", patient.id)
-            .eq("care_plan_id", plans[0].id)
-            .eq("log_date", today)
-            .maybeSingle();
+            // Get today's log
+            const today = new Date().toISOString().split("T")[0];
+            const { data: log } = await supabase
+              .from("adherence_logs")
+              .select("*")
+              .eq("patient_id", patient.id)
+              .eq("care_plan_id", plans[0].id)
+              .eq("log_date", today)
+              .maybeSingle();
 
-          setTodayLog(log);
+            setTodayLog(log);
+          }
         }
       }
     } catch (error) {
@@ -281,8 +295,18 @@ const PatientDashboard = () => {
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">Patient Dashboard</h2>
-          <p className="text-muted-foreground">Track your daily recovery progress</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground mb-2">Patient Dashboard</h2>
+              <p className="text-muted-foreground">Track your daily recovery progress</p>
+            </div>
+            {episode && (
+              <Button onClick={() => navigate(`/tele-visit?episode=${episode.id}`)} size="lg">
+                <Video className="h-5 w-5 mr-2" />
+                Join Tele-Visit
+              </Button>
+            )}
+          </div>
         </div>
 
         {!carePlan ? (
