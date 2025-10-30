@@ -38,6 +38,34 @@ const SeedData = () => {
     }
   };
 
+  const runProviderSeed = async () => {
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('seed-provider-data', {
+        method: 'POST',
+      });
+
+      if (error) throw error;
+
+      setResult(data);
+      toast({
+        title: "Success",
+        description: "Local provider seeded successfully",
+      });
+    } catch (error) {
+      console.error('Seed error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to seed provider data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-8">
       <Card>
@@ -59,10 +87,28 @@ const SeedData = () => {
             </ul>
           </div>
 
-          <Button onClick={runSeed} disabled={loading} className="w-full">
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? "Seeding..." : "Run Seed Script"}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={runSeed} disabled={loading} className="flex-1">
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? "Seeding..." : "Seed All Users"}
+            </Button>
+            
+            <Button onClick={runProviderSeed} disabled={loading} className="flex-1" variant="outline">
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {loading ? "Seeding..." : "Seed Local Provider Only"}
+            </Button>
+          </div>
+
+          <div className="p-3 bg-muted rounded-lg text-sm">
+            <p className="font-medium mb-1">Local Provider Test:</p>
+            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+              <li>Click "Seed Local Provider Only"</li>
+              <li>Sign in as provider-local@test.com (password: test123)</li>
+              <li>View Patient A data in provider portal</li>
+              <li>Toggle consent off in Admin Console → Consent Management</li>
+              <li>Refresh provider portal - Patient A should disappear</li>
+            </ol>
+          </div>
 
           {result && (
             <div className="mt-4 p-4 bg-muted rounded-lg">
