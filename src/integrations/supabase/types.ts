@@ -16,37 +16,55 @@ export type Database = {
     Tables: {
       adherence_logs: {
         Row: {
+          bp_diastolic: number | null
+          bp_systolic: number | null
           care_plan_id: string
           created_at: string
           exercises_completed: boolean | null
+          heart_rate: number | null
           id: string
           log_date: string
           medication_taken: boolean | null
           notes: string | null
           pain_level: number | null
           patient_id: string
+          spo2: number | null
+          symptom_description: string | null
+          symptom_severity: string | null
         }
         Insert: {
+          bp_diastolic?: number | null
+          bp_systolic?: number | null
           care_plan_id: string
           created_at?: string
           exercises_completed?: boolean | null
+          heart_rate?: number | null
           id?: string
           log_date?: string
           medication_taken?: boolean | null
           notes?: string | null
           pain_level?: number | null
           patient_id: string
+          spo2?: number | null
+          symptom_description?: string | null
+          symptom_severity?: string | null
         }
         Update: {
+          bp_diastolic?: number | null
+          bp_systolic?: number | null
           care_plan_id?: string
           created_at?: string
           exercises_completed?: boolean | null
+          heart_rate?: number | null
           id?: string
           log_date?: string
           medication_taken?: boolean | null
           notes?: string | null
           pain_level?: number | null
           patient_id?: string
+          spo2?: number | null
+          symptom_description?: string | null
+          symptom_severity?: string | null
         }
         Relationships: [
           {
