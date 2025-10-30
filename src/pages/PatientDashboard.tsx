@@ -1,19 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, FileText, MessageSquare, User, Video } from "lucide-react";
+import { CalendarDays, FileText, MessageSquare, Video } from "lucide-react";
+import RoleBasedNav from "@/components/RoleBasedNav";
 
 const PatientDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-foreground">Patient Portal</h1>
-          <Button variant="outline" size="sm">
-            <User className="h-4 w-4 mr-2" />
-            Profile
-          </Button>
-        </div>
-      </header>
+      <RoleBasedNav />
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">

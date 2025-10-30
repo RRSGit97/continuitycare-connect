@@ -1,16 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Settings, Users, BarChart3, Shield } from "lucide-react";
+import RoleBasedNav from "@/components/RoleBasedNav";
 
 const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-foreground">Admin Portal</h1>
-          <Button variant="outline" size="sm">Profile</Button>
-        </div>
-      </header>
+      <RoleBasedNav />
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
