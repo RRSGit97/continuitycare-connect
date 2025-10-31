@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
 
     // 1. Create local provider user
     const providerEmail = 'provider-local@test.com';
-    const providerPassword = 'test123';
+    const providerPassword = 'password123';
 
     let providerUserId: string;
 
@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
         providerId: providerId,
       },
       testInstructions: [
-        '1. Sign in as provider-local@test.com (password: test123)',
+        '1. Sign in as provider-local@test.com (password: password123)',
         '2. Navigate to /dashboard/provider',
         '3. You should see Patient A with consent granted',
         '4. To test consent revocation:',

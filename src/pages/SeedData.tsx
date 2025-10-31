@@ -141,7 +141,7 @@ const SeedData = () => {
       { email: 'specialist@test.com', password: 'password123' },
       { email: 'local-provider@test.com', password: 'password123' },
       { email: 'admin@test.com', password: 'password123' },
-      { email: 'provider-local@test.com', password: 'test123' },
+      { email: 'provider-local@test.com', password: 'password123' },
     ];
 
     const results: SignInTestResult[] = [];
@@ -233,7 +233,7 @@ const SeedData = () => {
             <p className="font-medium mb-1">Local Provider Test:</p>
             <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
               <li>Click "Seed Local Provider Only"</li>
-              <li>Sign in as provider-local@test.com (password: test123)</li>
+              <li>Sign in as provider-local@test.com (password: password123)</li>
               <li>View Patient A data in provider portal</li>
               <li>Toggle consent off in Admin Console → Consent Management</li>
               <li>Refresh provider portal - Patient A should disappear</li>
