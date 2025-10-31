@@ -3,11 +3,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+
+interface SignInTestResult {
+  email: string;
+  password: string;
+  success: boolean;
+  error?: string;
+}
 
 const SeedData = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [testingSignIn, setTestingSignIn] = useState(false);
+  const [signInResults, setSignInResults] = useState<SignInTestResult[]>([]);
   const { toast } = useToast();
 
   const runSeed = async () => {
@@ -122,6 +131,71 @@ const SeedData = () => {
     }
   };
 
+  const testAllSignIns = async () => {
+    setTestingSignIn(true);
+    setSignInResults([]);
+
+    const testUsers = [
+      { email: 'patient-a@test.com', password: 'password123' },
+      { email: 'patient-b@test.com', password: 'password123' },
+      { email: 'specialist@test.com', password: 'password123' },
+      { email: 'local-provider@test.com', password: 'password123' },
+      { email: 'admin@test.com', password: 'password123' },
+      { email: 'provider-local@test.com', password: 'test123' },
+    ];
+
+    const results: SignInTestResult[] = [];
+
+    for (const user of testUsers) {
+      try {
+        // Sign out first to ensure clean state
+        await supabase.auth.signOut();
+        
+        // Try to sign in
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: user.password,
+        });
+
+        if (error) {
+          results.push({
+            email: user.email,
+            password: user.password,
+            success: false,
+            error: error.message,
+          });
+        } else {
+          results.push({
+            email: user.email,
+            password: user.password,
+            success: true,
+          });
+          // Sign out after successful test
+          await supabase.auth.signOut();
+        }
+      } catch (error) {
+        results.push({
+          email: user.email,
+          password: user.password,
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+
+    setSignInResults(results);
+    setTestingSignIn(false);
+
+    const successCount = results.filter(r => r.success).length;
+    const totalCount = results.length;
+
+    toast({
+      title: successCount === totalCount ? "All Tests Passed" : "Some Tests Failed",
+      description: `${successCount}/${totalCount} users can sign in successfully`,
+      variant: successCount === totalCount ? "default" : "destructive",
+    });
+  };
+
   return (
     <div className="container mx-auto p-8">
       <Card>
@@ -210,6 +284,45 @@ const SeedData = () => {
                 <li>Verify adherence %, completion rate, and CSAT scores</li>
               </ol>
             </div>
+          </div>
+
+          <div className="border-t pt-4 mt-4">
+            <h3 className="font-semibold text-lg mb-2">Sign-In Testing</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Test all user accounts to verify they can sign in with their passwords
+            </p>
+            <Button onClick={testAllSignIns} disabled={testingSignIn} className="w-full" variant="secondary">
+              {testingSignIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {testingSignIn ? "Testing..." : "Test All Sign-Ins"}
+            </Button>
+
+            {signInResults.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {signInResults.map((result, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center justify-between p-3 rounded-lg ${
+                      result.success ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {result.success ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      )}
+                      <div>
+                        <p className="font-medium text-sm">{result.email}</p>
+                        <p className="text-xs text-muted-foreground">Password: {result.password}</p>
+                      </div>
+                    </div>
+                    {result.error && (
+                      <p className="text-xs text-red-500">{result.error}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {result && (
