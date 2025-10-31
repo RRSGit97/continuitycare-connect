@@ -37,6 +37,12 @@ Deno.serve(async (req) => {
     if (existingProvider) {
       console.log('Provider user already exists');
       providerUserId = existingProvider.id;
+      // Ensure password is consistent and email is confirmed
+      await supabaseAdmin.auth.admin.updateUserById(providerUserId, {
+        email_confirm: true,
+        password: providerPassword,
+      });
+      console.log('Updated provider password and confirmation');
     } else {
       // Create provider user
       const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
