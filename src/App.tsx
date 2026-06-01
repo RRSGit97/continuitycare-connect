@@ -30,7 +30,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/seed" element={<SeedData />} />
+          <Route
+            path="/seed"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <SeedData />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard/patient" 
             element={

@@ -22,6 +22,28 @@ Deno.serve(async (req) => {
       }
     );
 
+    // Require an authenticated admin caller
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const token = authHeader.replace('Bearer ', '').trim();
+    if (!token) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: adminRole } = await supabaseAdmin
+      .from('user_roles').select('role').eq('user_id', userData.user.id).eq('role', 'admin').maybeSingle();
+    if (!adminRole) {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     console.log('Starting provider data seeding...');
 
     // 1. Create local provider user
@@ -141,18 +163,17 @@ Deno.serve(async (req) => {
       console.log('Created new consent record');
     }
 
-    // 6. Return credentials
+    // 6. Return result (no password in response)
     const result = {
       success: true,
       message: 'Local provider data seeded successfully',
-      credentials: {
+      provider: {
         email: providerEmail,
-        password: providerPassword,
         userId: providerUserId,
         providerId: providerId,
       },
       testInstructions: [
-        '1. Sign in as provider-local@test.com (password: password123)',
+        '1. Sign in as provider-local@test.com using the shared test password',
         '2. Navigate to /dashboard/provider',
         '3. You should see Patient A with consent granted',
         '4. To test consent revocation:',
