@@ -6,7 +6,7 @@ The app demonstrates a role-based healthcare workflow across patients, specialis
 
 ## Live / Lovable Project
 
-Lovable project URL: https://lovable.dev/projects/488c4f86-d7c4-4da7-8e68-5c65258a6fd3
+Lovable Website URL: https://continuitycare-connect.lovable.app
 
 ## Core User Portals
 
