@@ -31,7 +31,6 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<UserRole>("patient");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -68,7 +67,6 @@ const Auth = () => {
   const selectDemoUser = (demoUser: DemoUser) => {
     setEmail(demoUser.email);
     setPassword(demoUser.password);
-    setRole(demoUser.role);
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -113,7 +111,6 @@ const Auth = () => {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: fullName,
-            role: role,
           }
         }
       });
@@ -246,20 +243,10 @@ const Auth = () => {
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">I am a</Label>
-                  <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-                    <SelectTrigger id="role">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="patient">Patient</SelectItem>
-                      <SelectItem value="specialist">Specialist</SelectItem>
-                      <SelectItem value="local_provider">Local Healthcare Provider</SelectItem>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  New accounts are created as patients. Specialist, provider, and admin
+                  roles must be granted by an administrator.
+                </p>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
