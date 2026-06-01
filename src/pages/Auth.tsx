@@ -12,6 +12,21 @@ import { useToast } from "@/hooks/use-toast";
 
 type UserRole = "patient" | "specialist" | "local_provider" | "admin";
 
+type DemoUser = {
+  label: string;
+  email: string;
+  password: string;
+  role: UserRole;
+};
+
+const demoUsers: DemoUser[] = [
+  { label: "Patient A", email: "patient-a@test.com", password: "password123", role: "patient" },
+  { label: "Patient B", email: "patient-b@test.com", password: "password123", role: "patient" },
+  { label: "Specialist", email: "specialist@test.com", password: "password123", role: "specialist" },
+  { label: "Local Provider", email: "local-provider@test.com", password: "password123", role: "local_provider" },
+  { label: "Admin", email: "admin@test.com", password: "password123", role: "admin" },
+];
+
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +63,12 @@ const Auth = () => {
       };
       navigate(dashboardMap[userRole] || '/');
     }
+  };
+
+  const selectDemoUser = (demoUser: DemoUser) => {
+    setEmail(demoUser.email);
+    setPassword(demoUser.password);
+    setRole(demoUser.role);
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -119,7 +140,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background p-4">
-      <Card className="w-full max-w-md shadow-lg">
+      <Card className="w-full max-w-2xl shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-primary/10 p-3 rounded-full">
@@ -138,6 +159,32 @@ const Auth = () => {
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="rounded-lg border bg-muted/40 p-4">
+                  <div className="mb-3">
+                    <p className="text-sm font-medium">Demo accounts</p>
+                    <p className="text-xs text-muted-foreground">
+                      Select a role to autofill demo credentials, then click Sign In.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {demoUsers.map((demoUser) => (
+                      <Button
+                        key={demoUser.email}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => selectDemoUser(demoUser)}
+                        className="justify-start text-xs"
+                      >
+                        {demoUser.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Shared password: <span className="font-mono">password123</span>
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
