@@ -27,6 +27,8 @@ const demoUsers: DemoUser[] = [
   { label: "Admin", email: "admin@test.com", password: "password123", role: "admin" },
 ];
 
+const SHOW_DEMO_ACCOUNTS = import.meta.env.DEV;
+
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -156,6 +158,7 @@ const Auth = () => {
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
+                {SHOW_DEMO_ACCOUNTS && (
                 <div className="rounded-lg border bg-muted/40 p-4">
                   <div className="mb-3">
                     <p className="text-sm font-medium">Demo accounts</p>
@@ -181,6 +184,7 @@ const Auth = () => {
                     Shared password: <span className="font-mono">password123</span>
                   </p>
                 </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
